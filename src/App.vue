@@ -5,12 +5,16 @@ import AppTodoList from '@/components/AppTodoList.vue'
 import AppAddTodo from '@/components/AppAddTodo.vue'
 import AppFooter from '@/components/AppFooter.vue'
 import type { Todo } from '@/types/Todo'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import type { Filter } from '@/types/Filter.ts'
+import type { Stats } from '@/types/Stats.ts'
+
+const activeFilter = ref<Filter>('All')
 
 const todos = ref<Todo[]>([
-  { id: 0, text: 'Learn the basics of Vue', completed: true },
-  { id: 1, text: 'lorem2', completed: false },
-  { id: 2, text: 'lorem5', completed: false },
+  { id: 0, text: 'Task #1', completed: true },
+  { id: 1, text: 'Task #2', completed: false },
+  { id: 2, text: 'Task #3', completed: false },
 ])
 
 const toggleTodo = (id: number) => {
@@ -24,23 +28,55 @@ const toggleTodo = (id: number) => {
 const removeTodo = (id: number) => {
   todos.value = todos.value.filter((todo: Todo) => todo.id !== id)
 }
+
 const addTodo = (todo: Todo) => {
   todos.value.push(todo)
 }
+
+const setFilter = (filter: Filter) => {
+  activeFilter.value = filter
+}
+
+const filteredTodos = computed((): Todo[] => {
+  switch (activeFilter.value) {
+    case 'Active':
+      return activeTodos.value
+    case 'Done':
+      return doneTodos.value
+    case 'All':
+    default:
+      return todos.value
+  }
+})
+
+const stats = computed((): Stats => {
+  return {
+    active: activeTodos.value.length,
+    done: doneTodos.value.length,
+  }
+})
+
+const activeTodos = computed((): Todo[] => {
+  return todos.value.filter((todo) => !todo.completed)
+})
+
+const doneTodos = computed((): Todo[] => {
+  return todos.value.filter((todo) => todo.completed)
+})
 </script>
 
 <template>
   <AppHeader />
 
-  <AppFilters />
+  <AppFilters :active-filter="activeFilter" @setFilter="setFilter" />
 
   <main class="app-main">
-    <AppTodoList :todos="todos" @toggleTodo="toggleTodo" @removeTodo="removeTodo" />
+    <AppTodoList :todos="filteredTodos" @toggleTodo="toggleTodo" @removeTodo="removeTodo" />
 
     <AppAddTodo @addTodo="addTodo" />
   </main>
 
-  <AppFooter />
+  <AppFooter :stats="stats" />
 </template>
 
 <style scoped></style>
