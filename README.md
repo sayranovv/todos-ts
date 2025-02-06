@@ -1,6 +1,13 @@
 # todos-ts
 
-This template should help get you started developing with Vue 3 in Vite.
+just todos written with new technology in my stack - TypeScript
+
+## Technologies Used
+
+- Vue
+- Typescript
+- Vite
+- Prettier
 
 ## Recommended IDE Setup
 
